@@ -1,0 +1,29 @@
+# Binaries
+cheapass
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Go
+vendor/
+.go/
+*.test
+*.prof
+coverage.out
+go.work
+
+# Environment
+.env
+.env.local
+.env.*.local
