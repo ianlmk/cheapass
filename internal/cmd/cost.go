@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -15,10 +14,8 @@ var costCmd = &cobra.Command{
 	Short: "Get AWS spending for a project",
 	Long:  `Query AWS Cost Explorer API to get project spending over a time period.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx := context.Background()
-
 		// Create AWS client
-		client, err := aws.NewClient(ctx)
+		client, err := aws.NewClient()
 		if err != nil {
 			return fmt.Errorf("failed to create AWS client: %w", err)
 		}
@@ -33,7 +30,7 @@ var costCmd = &cobra.Command{
 		startDate := endDate.AddDate(0, 0, -days)
 
 		// Query costs
-		costs, totalCost, err := client.GetProjectCosts(ctx, startDate, endDate, project, environment)
+		costs, totalCost, err := client.GetProjectCosts(startDate, endDate, project, environment)
 		if err != nil {
 			return fmt.Errorf("failed to get costs: %w", err)
 		}
