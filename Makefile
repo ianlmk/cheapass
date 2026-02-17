@@ -1,31 +1,53 @@
-.PHONY: help build test lint run clean install
+.PHONY: help build build-all install install-all test lint run clean deps
 
-BINARY_NAME=cheapass
-MAIN_PATH=cmd/cheapass/main.go
+CHEAPASS_MAIN=cmd/cheapass/main.go
+STATE_CHECK_MAIN=cmd/state_check/main.go
 
 help:
-	@echo "cheapass - AWS spend tracker"
+	@echo "cheapass - AWS spend & resource audit suite"
 	@echo ""
 	@echo "Available targets:"
-	@echo "  make build    - Build the binary"
-	@echo "  make install  - Install to \$$GOPATH/bin"
-	@echo "  make run      - Run locally"
-	@echo "  make test     - Run tests"
-	@echo "  make lint     - Run linter"
-	@echo "  make clean    - Remove build artifacts"
+	@echo "  make build        - Build cheapass binary only"
+	@echo "  make build-all    - Build all binaries (cheapass, state-check)"
+	@echo "  make install      - Install all tools to \$$GOPATH/bin"
+	@echo "  make install-old  - Install cheapass only (legacy)"
+	@echo "  make run          - Run cheapass cost command"
+	@echo "  make audit        - Run state_check audit"
+	@echo "  make test         - Run tests"
+	@echo "  make lint         - Run linter"
+	@echo "  make clean        - Remove build artifacts"
+	@echo "  make deps         - Update dependencies"
 
 build:
-	@echo "Building $(BINARY_NAME)..."
-	go build -o $(BINARY_NAME) $(MAIN_PATH)
-	@echo "✓ Built: ./$(BINARY_NAME)"
+	@echo "Building cheapass..."
+	go build -o cheapass $(CHEAPASS_MAIN)
+	@echo "✓ Built: ./cheapass"
+
+build-all:
+	@echo "Building cheapass..."
+	go build -o cheapass $(CHEAPASS_MAIN)
+	@echo "✓ Built: ./cheapass"
+	@echo "Building state-check..."
+	go build -o state-check $(STATE_CHECK_MAIN)
+	@echo "✓ Built: ./state-check"
 
 install:
-	@echo "Installing $(BINARY_NAME)..."
-	go install $(MAIN_PATH)
-	@echo "✓ Installed to \$$GOPATH/bin/$(BINARY_NAME)"
+	@echo "Installing all tools to \$$GOPATH/bin..."
+	go install ./cmd/cheapass
+	go install ./cmd/state_check
+	@echo "✓ Installed cheapass and state-check"
+
+install-old:
+	@echo "Installing cheapass only (legacy)..."
+	go install $(CHEAPASS_MAIN)
+	@echo "✓ Installed to \$$GOPATH/bin/cheapass"
 
 run: build
-	./$(BINARY_NAME) cost --help
+	./cheapass cost --help
+
+audit:
+	@echo "Running state_check audit..."
+	go run $(STATE_CHECK_MAIN) --region us-east-2
 
 test:
 	go test -v ./...
@@ -35,7 +57,7 @@ lint:
 	go fmt ./...
 
 clean:
-	rm -f $(BINARY_NAME)
+	rm -f cheapass state-check
 	go clean
 
 deps:
